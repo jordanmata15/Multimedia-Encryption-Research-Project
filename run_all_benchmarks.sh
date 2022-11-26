@@ -4,6 +4,9 @@
 #   - Variables in ALL CAPS can be considered global
 #   - Variables in lower case should only be used locally to that function
 
+# Author: Jordan Mata
+# Date: Nov 22, 2022
+
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 PACKAGE_DIR="${SCRIPTPATH}"
 DATA_DIR="${PACKAGE_DIR}/data"
@@ -22,7 +25,7 @@ setup() {
         echo -e "\nData file already exists! Delete it or rerun it. Filename:\n${DATA_FILE}\n"
         rm $DATA_FILE
     fi
-    echo "Algorithm, Resident_Size, System_Time, Wall_Clock_Time" > "$DATA_FILE"
+    echo "Algorithm, File_Size, Resident_Size, System_Time, Wall_Clock_Time" > "$DATA_FILE"
 
     #sudo apt-get install linux-tools-common linux-tools-5.15.0-52-generic
     #sudo sysctl -w kernel.perf_event_paranoid=-1
