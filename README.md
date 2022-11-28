@@ -2,7 +2,7 @@
 ## Brief
 This is a benchmark suite for benchmarking different text based encryption algorithms. The goal is to compare the runtime, max memory usage, and other relevant stats to compare different algorithms objectively.
 
-# Flow of Logic
+## Flow of Logic
 The user needs to execute `~/run_all_benchmarks.sh` with sudo privileges (see `Use of Sudo` for details on why sudo is needed).</br>
 The script will do the following:
 ```
