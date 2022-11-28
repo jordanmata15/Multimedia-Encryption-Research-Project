@@ -6,10 +6,10 @@ This is a benchmark suite for benchmarking different text based encryption algor
 The user needs to execute `~/run_all_benchmarks.sh` with sudo privileges (see `Use of Sudo` for details on why sudo is needed).</br>
 The script will do the following:
 ```
-For each algorithm directory:
+For alg_dir in algorithm_directories (the root of the package):
     For i in num_iterations:
         For data_file in the ~/data/data_to_encrypt:
-            run.sh script is executed with the specified data_file
+            alg_dir/run.sh script is executed with the specified data_file
             parse the data from the execution
             append the parsed data to ~/data/benchmark_data/data.csv 
 ```
