@@ -19,9 +19,8 @@ To add a new algorithm:
 1. Create a new folder in the root of the package with the name of the algorithm. (eg `~/AES/`)
 2. Place the algorithm implementation in a `src` directory within the folder from (1). (eg. `~/AES/src/`)
 3. Create a `run.sh` bash script in the algorithm root (eg. `~/AES/run.sh`). This script should accept `input_file`, `output_file`, and `encryption_key` as input parameters and call the algorithm executable with those parameters.
-4. Add the algorithm name to the ENCRYPTION_ALG_LIST variable in the `run_all_benchmarks` script. The algorithm name MUST match the folder name from (1).
 
-# Use of Sudo
+## Use of Sudo
 1. `chrt` to pin the process with a high priority in the process table to avoid context switches.
 2. use of some linux tools that require kernel access to read from some OS data (TODO flesh this explanation out)
 

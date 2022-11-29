@@ -16,8 +16,8 @@ BENCHMARK_DATA_DIR="${DATA_DIR}/benchmark_data"
 
 DATA_FILE=${BENCHMARK_DATA_DIR}/data.csv
 
-# names of the directories of each algorithm
-ENCRYPTION_ALG_LIST=("AES" "DES")
+# names of the directories in root directory (excluding data/)
+ENCRYPTION_ALG_DIR_LIST=($(ls -d ${PACKAGE_DIR}/*/ | grep -v data))
 
 # Sets up anything we need before running the benchmarks
 setup() {
@@ -79,8 +79,8 @@ parse_time_output() {
 #   1. iterations - number of times to run each algorithm on each data input
 run_all_algorithms_encryption() {
     iterations=$1
-    for algorithm in $ENCRYPTION_ALG_LIST; do
-        run_encryption_on_algorithm "$algorithm" $iterations
+    for algorithm_dir in $ENCRYPTION_ALG_DIR_LIST; do
+        run_encryption_on_algorithm "$algorithm_dir" $iterations
     done
 }
 
@@ -88,14 +88,15 @@ run_all_algorithms_encryption() {
 # Calls the algorithm run script on the entire set of data files
 # and run the benchmark a given number of times
 # args:
-#   1. alg_name - name of the algorithm
+#   1. alg_dir_name - path to the algorithm
 #   2. iterations - number of times to run each algorithm on each data input
 run_encryption_on_algorithm() {
-    alg_name=$1
+    alg_dir_name=$1
     iterations=$2
 
+    alg_name=$(basename $alg_dir_name)
     # script that will do the run for us as long as we give the input parameters
-    run_script="${PACKAGE_DIR}/${alg_name}/run_time.sh"
+    run_script="${alg_dir_name}/run_time.sh"
 
     # encrypt each file in the DATA_DIR.
     for data_filename in $INPUT_DATA_DIR/*; do
