@@ -15,7 +15,7 @@ with open('filekey.key', 'rb') as filekey:
 fernet = Fernet(key)
  
 # opening the original file to encrypt
-with open('data/test.txt', 'rb') as file:
+with open('data/data_to_encrypt/alice29.txt', 'rb') as file:
     original = file.read()
      
 # encrypting the file
@@ -23,13 +23,13 @@ encrypted = fernet.encrypt(original)
  
 # opening the file in write mode and
 # writing the encrypted data
-with open('test.txt', 'wb') as encrypted_file:
+with open('data/encrypted_data/test.txt', 'wb') as encrypted_file:
     encrypted_file.write(encrypted)
 
 fernet = Fernet(key)
  
 # opening the encrypted file
-with open('test.txt', 'rb') as enc_file:
+with open('data/encrypted_data/test.txt', 'rb') as enc_file:
     encrypted = enc_file.read()
  
 # decrypting the file
@@ -37,5 +37,5 @@ decrypted = fernet.decrypt(encrypted)
  
 # opening the file in write mode and
 # writing the decrypted data
-with open('detest.txt', 'wb') as dec_file:
+with open('data/encrypted_data/detest.txt', 'wb') as dec_file:
     dec_file.write(decrypted)

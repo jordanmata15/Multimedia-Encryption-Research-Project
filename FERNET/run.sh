@@ -13,7 +13,7 @@
 
 SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 SRC_DIR="${SCRIPT_PATH}/src"
-EXE="$SRC_DIR/aes.py"
+EXE="$SRC_DIR/fernet.py"
 
 enc_input_file=$1
 enc_output_file=$2
