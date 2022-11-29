@@ -850,3 +850,57 @@ class triple_des(_baseDes):
 			data = self.__key2.crypt(data, ENCRYPT)
 			data = self.__key1.crypt(data, DECRYPT)
 		return self._unpadData(data, pad, padmode)
+
+'''
+Below is code added for Multimedia class (run triple DES)
+'''
+def encrypt(key, message):
+	des = des(key, pad=None, padmode=PAD_PKCS5)
+	return des.encrypt(message, padmode=PAD_PKCS5)
+
+def decrypt(key, message):
+	des = des(key, pad=None, padmode=PAD_PKCS5)
+	return des.decrypt(message)
+
+def benchmark():
+
+    # Triple DES uses 16 byte keys, DES only 8 bytes
+	# As of now, we are using triple DES
+    key = b'P' * 16
+    message = b'M' * 16
+    des = des(key, pad=None, padmode=PAD_PKCS5)
+
+    for i in range(30000):
+        des.encrypt(message)
+
+__all__ = [encrypt, decrypt, triple_des]
+
+def write(filename, b):
+    f = open(filename, "wb")
+    f.write(b)
+    f.close()
+
+if __name__ == '__main__':
+    import sys
+    write_stdout = lambda b: sys.stdout.buffer.write(b)
+    read = lambda: sys.stdin.buffer.read()
+
+    if len(sys.argv) < 2:
+        print('Usage: ./pyDes.py encrypt "filename" "key" "message"')
+        print('Running tests...')
+        #from test_pydes import *
+        #test_pydes.main()
+    elif len(sys.argv) == 2 and sys.argv[1] == 'benchmark':
+        benchmark()
+        exit()
+    elif len(sys.argv) == 3 or len(sys.argv) == 4:
+        text = read()
+    elif len(sys.argv) > 4:
+        text = ' '.join(sys.argv[4:])
+
+    if 'encrypt'.startswith(sys.argv[1]):
+        write(sys.argv[2], encrypt(sys.argv[3], text))
+    elif 'decrypt'.startswith(sys.argv[1]):
+        write(sys.argv[2], decrypt(sys.argv[3], text))
+    else:
+        print('Expected command "encrypt" or "decrypt" in first argument.')
