@@ -25,7 +25,7 @@ setup() {
         echo -e "\nData file already exists! Delete it or rerun it. Filename:\n${DATA_FILE}\n"
         rm $DATA_FILE
     fi
-    echo "Algorithm, File_Size, Resident_Size, System_Time, Wall_Clock_Time" > "$DATA_FILE"
+    echo "Algorithm, File_Size, Encrypted_Size, Resident_Size, System_Time, Wall_Clock_Time" > "$DATA_FILE"
 
     #sudo apt-get install linux-tools-common linux-tools-5.15.0-52-generic
     #sudo sysctl -w kernel.perf_event_paranoid=-1
@@ -35,8 +35,8 @@ setup() {
 # args:
 #   See usage statement
 record_data() {
-    if [[ $# != 5 ]]; then
-        echo -e "\nError with parse_output(alg_name, data_file_size, resident_size, system_time, wall_clock_time)"
+    if [[ $# != 6 ]]; then
+        echo -e "\nError with parse_output(alg_name, data_file_size, encrypted_size, resident_size, system_time, wall_clock_time)"
         echo -e "Received $# input parameters.\n"
         exit -1
     fi
@@ -47,7 +47,7 @@ record_data() {
     system_time=$4
     wall_clock_time=$5
 
-    echo "$alg_name, $data_file_size, $resident_size, $system_time, $wall_clock_time" >> "$DATA_FILE"
+    echo "$alg_name, $data_file_size, $encrypted_size, $resident_size, $system_time, $wall_clock_time" >> "$DATA_FILE"
 }
 
 
@@ -68,6 +68,8 @@ parse_time_output() {
     
     time_output=$1
 
+    # TODO 
+    # FIX parsing of times. Grep isn't working correctly. Use regex instead
     RESIDENT_SIZE=$(echo -e "$time_output" | grep "Maximum resident set size (kbytes):" | grep -oE '[0-9]+')
     SYSTEM_TIME=$(echo -e "$time_output" | grep "System time (seconds):" | grep -oE '[0-9]+.[0-9]+')
     WALL_CLOCK_TIME=$(echo -e "$time_output" | grep "Elapsed (wall clock) time (h:mm:ss or m:ss):" | grep -oE '[0-9]+:[0-9]+.[0-9]+')
@@ -96,7 +98,7 @@ run_encryption_on_algorithm() {
 
     alg_name=$(basename $alg_dir_name)
     # script that will do the run for us as long as we give the input parameters
-    run_script="${alg_dir_name}/run_time.sh"
+    run_script="${alg_dir_name}/run.sh"
 
     # encrypt each file in the DATA_DIR.
     for data_filename in $INPUT_DATA_DIR/*; do
@@ -105,19 +107,21 @@ run_encryption_on_algorithm() {
         encrypted_filepath=$ENCRYPTED_DATA_DIR/$filename_without_ext.enc
 
         for (( i=0; i<$iterations; i++)); do
+            echo "Running ${alg_name} iteration $i/$iterations" 
             # call a subscript to time the exe for us, then parse it
             # This part of the line lets us avoid context switches to get more accurate times:
             #   sudo chrt -f 99
             time_output=$(sudo chrt -f 99 /usr/bin/time --verbose \
-                            $run_time_script "$data_filename" \
+                            "$run_script" "$data_filename" \
                             "$encrypted_filepath" "$CIPHER_KEY" 2>&1)
             parse_time_output "$time_output"
 
             # generate other benchmark data
             file_size=$(stat --printf="%s" "$data_filename")
+            encrypted_size=$(stat --printf="%s" "$encrypted_filepath")
 
             # log the data line item
-            record_data "$alg_name" "$file_size" "$RESIDENT_SIZE" "$SYSTEM_TIME" "$WALL_CLOCK_TIME"
+            record_data "$alg_name" "$file_size" "$encrypted_size" "$RESIDENT_SIZE" "$SYSTEM_TIME" "$WALL_CLOCK_TIME"
         done
     done       
 }
