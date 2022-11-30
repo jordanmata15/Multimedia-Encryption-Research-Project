@@ -79,7 +79,7 @@ parse_time_output() {
 #   1. iterations - number of times to run each algorithm on each data input
 run_all_algorithms_encryption() {
     iterations=$1
-    for algorithm_dir in $ENCRYPTION_ALG_DIR_LIST; do
+    for algorithm_dir in ${ENCRYPTION_ALG_DIR_LIST[@]}; do
         run_encryption_on_algorithm "$algorithm_dir" $iterations
     done
 }
