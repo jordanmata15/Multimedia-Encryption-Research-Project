@@ -3,12 +3,17 @@
 #prerequisite
 #%pip install cryptography
 
+import os
 import sys
 from cryptography.fernet import Fernet
 
+SCRIPT_PATH = os.path.dirname(os.path.abspath( __file__ ))
+KEY_DIR = os.path.join(SCRIPT_PATH, '..')
+KEY_PATH = os.path.join(KEY_DIR, "secret.key")
+
 
 def encrypt(input_file, output_file):
-    key = open("secret.key", "rb").read()
+    key = open(KEY_PATH, "rb").read()
     fernet = Fernet(key)
 
     with open(input_file, 'rb') as file:
@@ -22,7 +27,7 @@ def encrypt(input_file, output_file):
 
 
 def decrypt(input_file, output_file):
-    key = open("secret.key", "rb").read()
+    key = open(KEY_PATH, "rb").read()
     fernet = Fernet(key)
 
     with open(input_file, 'rb') as enc_file:
