@@ -21,4 +21,4 @@ cipher_key=$3
 
 # This calls the the algorithm with the specified file as input, the specified output file, and cipher key
 #   $EXE encrypt "$enc_output_file" "$cipher_key" < $enc_input_file
-$EXE decrypt "$enc_input_file" "$enc_output_file" "$cipher_key"
+$EXE encrypt "$enc_input_file" "$enc_output_file" "$cipher_key"
