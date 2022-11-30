@@ -107,7 +107,7 @@ run_encryption_on_algorithm() {
         encrypted_filepath=$ENCRYPTED_DATA_DIR/$filename_without_ext.enc
 
         for (( i=0; i<$iterations; i++)); do
-            echo "Running ${alg_name} iteration $i/$iterations" 
+            echo "Running ${alg_name} iteration $((i+1))/$iterations" 
             # call a subscript to time the exe for us, then parse it
             # This part of the line lets us avoid context switches to get more accurate times:
             #   sudo chrt -f 99
