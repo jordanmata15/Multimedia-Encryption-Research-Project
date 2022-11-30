@@ -19,9 +19,6 @@ enc_input_file=$1
 enc_output_file=$2
 cipher_key=$3
 
-# This part of the line lets us avoid context switches to get more accurate times:
-#   sudo chrt -f 99 /usr/bin/time --verbose
-
-#TODO
-# Make a call to the python script using the enc_input_file, enc_output_file, and cipher_key variables
-$EXE encrypt "$enc_output_file" "$cipher_key" < "$enc_input_file"
+# ignore the input cipher key. Use the one stored in file secret.key
+cipher_key=$(cat $SCRIPT_PATH/secret.key)
+$EXE decrypt "$enc_output_file" "$cipher_key" < "$enc_input_file"
