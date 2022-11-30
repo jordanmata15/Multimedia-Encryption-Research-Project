@@ -24,3 +24,4 @@ cipher_key=$3
 
 #TODO
 # Make a call to the python script using the enc_input_file, enc_output_file, and cipher_key variables
+$EXE encrypt "$enc_output_file" "$cipher_key" < "$enc_input_file"
