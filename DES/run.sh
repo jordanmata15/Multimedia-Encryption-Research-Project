@@ -21,4 +21,4 @@ cipher_key=$3
 
 # ignore the input cipher key. Use the one stored in file secret.key
 cipher_key=$(cat $SCRIPT_PATH/secret.key)
-$EXE decrypt "$enc_output_file" "$cipher_key" < "$enc_input_file"
+"$EXE" decrypt "$enc_output_file" "$cipher_key" < "$enc_input_file"
