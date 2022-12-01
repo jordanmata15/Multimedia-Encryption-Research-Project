@@ -3,6 +3,8 @@
 # Script to run all benchmarks in all directories
 #   - Variables in ALL CAPS can be considered global
 #   - Variables in lower case should only be used locally to that function
+#   Note: All variables are technically global, but we use this convention 
+#         to make things a bit more manageable.
 
 # Author: Jordan Mata
 # Date: Nov 22, 2022
@@ -25,7 +27,7 @@ setup() {
         echo -e "\nData file already exists! Delete it or rerun it. Filename:\n${DATA_FILE}\n"
         rm $DATA_FILE
     fi
-    echo "Algorithm, File_Size, Encrypted_Size, Resident_Size, System_Time, Wall_Clock_Time" > "$DATA_FILE"
+    echo "Algorithm, File_Size, Encrypted_Size, Resident_Size, User_Time, System_Time, Wall_Clock_Time" > "$DATA_FILE"
 
     #sudo apt-get install linux-tools-common linux-tools-5.15.0-52-generic
     #sudo sysctl -w kernel.perf_event_paranoid=-1
@@ -35,19 +37,21 @@ setup() {
 # args:
 #   See usage statement
 record_data() {
-    if [[ $# != 6 ]]; then
-        echo -e "\nError with parse_output(alg_name, data_file_size, encrypted_size, resident_size, system_time, wall_clock_time)"
+    if [[ $# != 7 ]]; then
+        echo -e "\nError with parse_output(alg_name, data_file_size, encrypted_size, resident_size, user_time, system_time, wall_clock_time)"
         echo -e "Received $# input parameters.\n"
         exit -1
     fi
 
     alg_name=$1
     data_file_size=$2
-    resident_size=$3
-    system_time=$4
-    wall_clock_time=$5
+    encrypted_size=$3
+    resident_size=$4
+    user_time=$5
+    system_time=$6
+    wall_clock_time=$7
 
-    echo "$alg_name, $data_file_size, $encrypted_size, $resident_size, $system_time, $wall_clock_time" >> "$DATA_FILE"
+    echo "$alg_name, $data_file_size, $encrypted_size, $resident_size, $user_time, $system_time, $wall_clock_time" >> "$DATA_FILE"
 }
 
 
@@ -57,6 +61,7 @@ record_data() {
 #   1. the "time" output stored in a variable
 # Side effect:
 #   - populates the RESIDENT_SIZE global variable
+#   - populates the USER_TIME global variable
 #   - populates the SYSTEM_TIME global variable
 #   - populates the WALL_CLOCK_TIME global variable
 parse_time_output() {
@@ -68,9 +73,8 @@ parse_time_output() {
     
     time_output=$1
 
-    # TODO 
-    # FIX parsing of times. Grep isn't working correctly. Use regex instead
     RESIDENT_SIZE=$(echo -e "$time_output" | grep "Maximum resident set size (kbytes):" | grep -oE '[0-9]+')
+    USER_TIME=$(echo -e "$time_output" | grep "User time (seconds):" | grep -oE '[0-9]+.[0-9]+')
     SYSTEM_TIME=$(echo -e "$time_output" | grep "System time (seconds):" | grep -oE '[0-9]+.[0-9]+')
     WALL_CLOCK_TIME=$(echo -e "$time_output" | grep "Elapsed (wall clock) time (h:mm:ss or m:ss):" | grep -oE '[0-9]+:[0-9]+.[0-9]+')
 }
@@ -121,7 +125,7 @@ run_encryption_on_algorithm() {
             encrypted_size=$(stat --printf="%s" "$encrypted_filepath")
 
             # log the data line item
-            record_data "$alg_name" "$file_size" "$encrypted_size" "$RESIDENT_SIZE" "$SYSTEM_TIME" "$WALL_CLOCK_TIME"
+            record_data "$alg_name" "$file_size" "$encrypted_size" "$RESIDENT_SIZE" "$USER_TIME" "$SYSTEM_TIME" "$WALL_CLOCK_TIME"
         done
     done       
 }
