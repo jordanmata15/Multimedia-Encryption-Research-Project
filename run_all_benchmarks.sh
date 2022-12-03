@@ -21,6 +21,13 @@ DATA_FILE=${BENCHMARK_DATA_DIR}/data.csv
 # names of the directories in root directory (excluding data/)
 ENCRYPTION_ALG_DIR_LIST=($(ls -d ${PACKAGE_DIR}/*/ | grep -v data))
 
+
+#checks if gpg is installed, only works with debian systems
+if [ $(dpkg-query -W -f='${Status}' gnupg 2>/dev/null | grep -c "ok installed") -eq 0 ];
+then
+	sudo apt install gnupg
+fi
+
 # Sets up anything we need before running the benchmarks
 setup() {
     if [[ -f "$DATA_FILE" ]]; then
