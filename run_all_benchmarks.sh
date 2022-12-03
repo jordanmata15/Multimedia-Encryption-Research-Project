@@ -6,7 +6,7 @@
 #   Note: All variables are technically global, but we use this convention 
 #         to make things a bit more manageable.
 
-# Author: Jordan Mata
+# Author: Jordan Mata & HRIZZLE
 # Date: Nov 22, 2022
 
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
@@ -15,6 +15,12 @@ DATA_DIR="${PACKAGE_DIR}/data"
 INPUT_DATA_DIR="${DATA_DIR}/data_to_encrypt"
 ENCRYPTED_DATA_DIR="${DATA_DIR}/encrypted_data"
 BENCHMARK_DATA_DIR="${DATA_DIR}/benchmark_data"
+
+
+< /dev/urandom tr -dc "[:alnum:]" | head -c1000 > ${INPUT_DATA_DIR}/1KB.txt
+#< /dev/urandom tr -dc "[:alnum:]" | head -c1000000 > ${INPUT_DATA_DIR}/1MB.txt
+< /dev/urandom tr -dc "[:alnum:]" | head -c100000000 > ${INPUT_DATA_DIR}/100MB.txt
+#< /dev/urandom tr -dc "[:alnum:]" | head -c1000000000 > ${INPUT_DATA_DIR}/1GB.txt
 
 DATA_FILE=${BENCHMARK_DATA_DIR}/data.csv
 
@@ -34,7 +40,7 @@ setup() {
         echo -e "\nData file already exists! Delete it or rerun it. Filename:\n${DATA_FILE}\n"
         rm $DATA_FILE
     fi
-    echo "Algorithm, File_Size, Encrypted_Size, Resident_Size, User_Time, System_Time, Wall_Clock_Time" > "$DATA_FILE"
+    echo "Algorithm, File_Size, Encrypted_Size, Resident_Size, User_Time, System_Time, Wall_Clock_Time, Time_Nanoseconds" > "$DATA_FILE"
 
     #sudo apt-get install linux-tools-common linux-tools-5.15.0-52-generic
     #sudo sysctl -w kernel.perf_event_paranoid=-1
@@ -44,7 +50,7 @@ setup() {
 # args:
 #   See usage statement
 record_data() {
-    if [[ $# != 7 ]]; then
+    if [[ $# != 8 ]]; then
         echo -e "\nError with parse_output(alg_name, data_file_size, encrypted_size, resident_size, user_time, system_time, wall_clock_time)"
         echo -e "Received $# input parameters.\n"
         exit -1
@@ -57,8 +63,9 @@ record_data() {
     user_time=$5
     system_time=$6
     wall_clock_time=$7
+    time_nano=$8
 
-    echo "$alg_name, $data_file_size, $encrypted_size, $resident_size, $user_time, $system_time, $wall_clock_time" >> "$DATA_FILE"
+    echo "$alg_name, $data_file_size, $encrypted_size, $resident_size, $user_time, $system_time, $wall_clock_time", $time_nano >> "$DATA_FILE"
 }
 
 
@@ -118,21 +125,24 @@ run_encryption_on_algorithm() {
         encrypted_filepath=$ENCRYPTED_DATA_DIR/$filename_without_ext.enc
 
         for (( i=0; i<$iterations; i++)); do
-            echo "Running ${alg_name} iteration $((i+1))/$iterations" 
+            echo "Running ${alg_name} iteration $((i+1))/$iterations on $filename_without_ext" 
             # call a subscript to time the exe for us, then parse it
             # This part of the line lets us avoid context switches to get more accurate times:
             #   sudo chrt -f 99
+            ts=$(date +%s%N)
             time_output=$(sudo chrt -f 99 /usr/bin/time --verbose \
                             "$run_script" "$data_filename" \
                             "$encrypted_filepath" "$CIPHER_KEY" 2>&1)
             parse_time_output "$time_output"
+            TIME_NANO=$(($(date +%s%N) - $ts))
+            
 
             # generate other benchmark data
             file_size=$(stat --printf="%s" "$data_filename")
             encrypted_size=$(stat --printf="%s" "$encrypted_filepath")
 
             # log the data line item
-            record_data "$alg_name" "$file_size" "$encrypted_size" "$RESIDENT_SIZE" "$USER_TIME" "$SYSTEM_TIME" "$WALL_CLOCK_TIME"
+            record_data "$alg_name" "$file_size" "$encrypted_size" "$RESIDENT_SIZE" "$USER_TIME" "$SYSTEM_TIME" "$WALL_CLOCK_TIME" "$TIME_NANO"
         done
     done       
 }
@@ -157,7 +167,7 @@ run_decryption() {
 # This will call all the scripts we want
 main() {
     setup
-    run_all_algorithms_encryption 3 # second param is number of times to encrypt each file
+    run_all_algorithms_encryption 1 # second param is number of times to encrypt each file
 }
 
 main # run main()

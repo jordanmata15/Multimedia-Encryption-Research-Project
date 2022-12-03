@@ -26,3 +26,6 @@ To add a new algorithm:
 
 ## Important Notes
 While introducing a `run.sh` script will incur some overhead, each script is minimal and the overhead should be negligible given that the items in the data set are sufficiently large.
+
+##GPG
+Most of the programs run are using gpg, whose source code may be found here: https://github.com/gpg/gnupg
