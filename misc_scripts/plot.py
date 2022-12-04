@@ -11,6 +11,7 @@ DATA_DIR = os.path.join(PACKAGE_DIR, 'data')
 BENCHMARK_DATA_DIR = os.path.join(DATA_DIR, 'benchmark_data')
 BENCHMARK_DATA_PATH = os.path.join(BENCHMARK_DATA_DIR, 'data.csv')
 
+plt.figure(figsize=(10, 7), dpi=100)
 
 def get_sec(time_str):
     """Get seconds from time."""
@@ -69,7 +70,8 @@ def plot_size_time(dataframe):
     plt.ylabel('Time (nanoseconds)')
     plt.tight_layout()
     plt.legend()
-    plt.show()
+    plt.savefig("./data/graphs/times" + ".png")
+    #plt.show()
             
 def plot_size_diff(dataframe):
     no_compression_df = dataframe[dataframe['Compression_Algo'] == 'none']
@@ -149,7 +151,7 @@ if __name__ == "__main__":
     data_df = sanitize_data(data_df)
     #data_df.to_csv('formatted_data.csv')
     #print(tabulate(data_df, headers='keys'))
-    #plot_size_time(data_df)
+    plot_size_time(data_df)
     #plot_size_diff(data_df)
     #plot_size_diff_bar(data_df)
     plot_size_diff_bar_pct(data_df)
